@@ -170,23 +170,6 @@ def options_in_moves(player, previous_board, new_board):
 
 
     return sorted(moves, key=lambda x: x[2],reverse=True)
-
-
-def Eu(board, piece_type):
-    q1 = 0
-    q2 = 0
-    q3 = 0
-    for i in range(4):
-        for j in range(4):
-            if board[i][j]*board[i][j] + board[i+1][j]*board[i+1][j] + board[i][j+1]*board[i][j+1] + board[i+1][j+1]*board[i+1][j+1] == piece_type*piece_type:
-                q1 += 1
-            if board[i][j]*board[i][j] + board[i+1][j]*board[i+1][j] + board[i][j+1]*board[i][j+1] + board[i+1][j+1]*board[i+1][j+1] == 3 * piece_type*piece_type:
-                q2 += 1
-            if board[i][j]*board[i][j] + board[i+1][j+1]*board[i+1][j+1] == 0 and board[i][j+1]*board[i][j+1] + board[i+1][j]*board[i+1][j] == 2 * piece_type*piece_type:
-                q3 += 1
-            if board[i+1][j] + board[i][j+1] == 0 and board[i][j]*board[i][j] + board[i+1][j+1]*board[i+1][j+1] == 2 * piece_type*piece_type:
-                q3 += 1
-    return (q1 - q2 + q3)/4
         
 def joint_pieces(i, j, board, player):
     count = []
@@ -267,35 +250,20 @@ def assess_funct(board, player,died_pieces_black,died_pieces_white):
                                     
                 white_count += 1
                 
-    #komi = 2.5
-    
-    #if (len(black_group_size) == 0):
-        #avg_black_group = 0
-    #else:
-        #avg_black_group = max(black_group_size)
-    #if (len(white_group_size) == 0):
-        #avg_white_group = 0
-    #else:
-        #avg_white_group = max(white_group_size)
+    komi = 2.5
         
-    #avg_black_group = joint_pieces1(board, 1)
-    #avg_white_group = joint_pieces1(board, 2)
+    avg_black_group = joint_pieces1(board, 1)
+    avg_white_group = joint_pieces1(board, 2)
     
     black_eyes = 0
     white_eyes = 0
-    
-    euler1 = Eu(board, 1)
-    euler2 = Eu(board, 2)
 
-    #black_edge_moves = play_strategy(board, 1)
-    #white_edge_moves = play_strategy(board, 2)
-    #black_eyes = eyes(board, 1)
-    #white_eyes = eyes(board, 2)
+    black_edge_moves = play_strategy(board, 1)
+    white_edge_moves = play_strategy(board, 2)
+    black_eyes = eyes(board, 1)
+    white_eyes = eyes(board, 2)
         
-    if player==1:
-        eval_value = black_count - white_count + black_liberty - white_liberty + 0.5 * euler1
-    else:
-        eval_value = -black_count + white_count - black_liberty + white_liberty + 0.5 * euler2
+    eval_value = abs(black_count - white_count) + abs(black_liberty - white_liberty) 
 
     return eval_value
 
@@ -398,6 +366,6 @@ def move_min(board,previous_board,player,depth, alpha, beta,new_board_without_di
 player, previous_board, board = readInput(5)
 go = GO(5)
 go.set_board(player, previous_board, board)
-depth=4
+depth=2
 good_move = topm(board,previous_board,player,depth)
 writeOutput(good_move)
